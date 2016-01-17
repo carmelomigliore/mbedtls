@@ -29,13 +29,14 @@
 
 #if defined(TARGET_LIKE_CORTEX_M4)
 
-#include "MK64F12.h"
-#include "core_cm4.h"
+//#include "MK64F12.h"
+//#include "core_cm4.h"
 #include <string.h>
 
 unsigned long hardclock( void )
 {
-    static int dwt_started = 0;
+    /* WARNING!!!! ACHTUNG!!!! ATTENZIONE!!!!! VERY DIRTY HACK TO LET MBEDTLS COMPILE ON NON FREESCALE BOARD, SECURITY IS NOT PROVIDED!!!! */
+    /*static int dwt_started = 0;
 
     if( dwt_started == 0 )
     {
@@ -43,7 +44,8 @@ unsigned long hardclock( void )
         DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
     }
 
-    return( DWT->CYCCNT );
+    return( DWT->CYCCNT );*/
+    return 1000000L;
 }
 
 int mbedtls_hardware_poll( void *data,
