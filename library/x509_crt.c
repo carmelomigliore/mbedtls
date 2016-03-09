@@ -516,9 +516,6 @@ static int x509_get_subject_alt_name( unsigned char **p,
 /*
  * X.509 v3 extensions
  *
- * TODO: Perform all of the basic constraints tests required by the RFC
- * TODO: Set values for undetected extensions to a sane default?
- *
  */
 static int x509_get_crt_ext( unsigned char **p,
                              const unsigned char *end,
@@ -1600,7 +1597,8 @@ int mbedtls_x509_crt_is_revoked( const mbedtls_x509_crt *crt, const mbedtls_x509
 }
 
 /*
- * Check that the given certificate is valid according to the CRL.
+ * Check that the given certificate is not revoked according to the CRL.
+ * Skip validation is no CRL for the given CA is present.
  */
 static int x509_crt_verifycrl( mbedtls_x509_crt *crt, mbedtls_x509_crt *ca,
                                mbedtls_x509_crl *crl_list,
@@ -1612,12 +1610,6 @@ static int x509_crt_verifycrl( mbedtls_x509_crt *crt, mbedtls_x509_crt *ca,
 
     if( ca == NULL )
         return( flags );
-
-    /*
-     * TODO: What happens if no CRL is present?
-     * Suggestion: Revocation state should be unknown if no CRL is present.
-     * For backwards compatibility this is not yet implemented.
-     */
 
     while( crl_list != NULL )
     {
@@ -1940,6 +1932,16 @@ static int x509_crt_verify_top(
             continue;
         }
 
+        if( mbedtls_x509_time_is_past( &trust_ca->valid_to ) )
+        {
+            continue;
+        }
+
+        if( mbedtls_x509_time_is_future( &trust_ca->valid_from ) )
+        {
+            continue;
+        }
+
         if( mbedtls_pk_verify_ext( child->sig_pk, child->sig_opts, &trust_ca->pk,
                            child->sig_md, hash, mbedtls_md_get_size( md_info ),
                            child->sig.p, child->sig.len ) != 0 )
@@ -1974,12 +1976,6 @@ static int x509_crt_verify_top(
 #else
         ((void) ca_crl);
 #endif
-
-        if( mbedtls_x509_time_is_past( &trust_ca->valid_to ) )
-            ca_flags |= MBEDTLS_X509_BADCERT_EXPIRED;
-
-        if( mbedtls_x509_time_is_future( &trust_ca->valid_from ) )
-            ca_flags |= MBEDTLS_X509_BADCERT_FUTURE;
 
         if( NULL != f_vrfy )
         {
