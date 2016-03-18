@@ -1899,9 +1899,13 @@
  *
  * Enable the TCP and UDP over IPv6/IPv4 networking routines.
  *
- * \note This module only works on Unix (including Linux, BSD and OS X) and
- * Windows. For other platforms, you'll want to disable it, and write your
+ * \note This module only works on POSIX/Unix (including Linux, BSD and OS X)
+ * and Windows. For other platforms, you'll want to disable it, and write your
  * own networking callbacks to be passed to \c mbedtls_ssl_set_bio().
+ *
+ * \note See also our Knowledge Base article about porting to a new
+ * environment:
+ * https://tls.mbed.org/kb/how-to/how-do-i-port-mbed-tls-to-a-new-environment-OS
  *
  * Module:  library/net.c
  *
@@ -2251,7 +2255,8 @@
  * By default mbed TLS assumes it is used in a non-threaded environment or that
  * contexts are not shared between threads. If you do intend to use contexts
  * between threads, you will need to enable this layer to prevent race
- * conditions.
+ * conditions. See also our Knowledge Base article about threading:
+ * https://tls.mbed.org/kb/development/thread-safety-and-multi-threading
  *
  * Module:  library/threading.c
  *
@@ -2270,12 +2275,16 @@
  *
  * Enable the semi-portable timing interface.
  *
- * \note The provided implementation only works on Unix (including Linux, BSD
- * and OS X) and Windows. On other platforms, you can either disable that
+ * \note The provided implementation only works on POSIX/Unix (including Linux,
+ * BSD and OS X) and Windows. On other platforms, you can either disable that
  * module and provide your own implementations of the callbacks needed by
  * \c mbedtls_ssl_set_timer_cb() for DTLS, or leave it enabled and provide
  * your own implementation of the whole module by setting
  * \c MBEDTLS_TIMING_ALT in the current file.
+ *
+ * \note See also our Knowledge Base article about porting to a new
+ * environment:
+ * https://tls.mbed.org/kb/how-to/how-do-i-port-mbed-tls-to-a-new-environment-OS
  *
  * Module:  library/timing.c
  * Caller:  library/havege.c
